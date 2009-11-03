@@ -109,8 +109,8 @@ package com.base.parse {
 		}
 		
 		internal function fixHtml( err:Error ) : void {
-			trace("___________________________________________________________________", org_html, "___________________________________________________________________");
-			throw new IllegalOperationError( "Your HTML is not well formed, check this out for help...\nhttp://infohound.net/tidy/ \n\n" + err.message );
+			trace("___________________________________________________________________\n", org_html, "\n___________________________________________________________________");
+			throw new IllegalOperationError( "Your HTML is not well formed: " + err.message );
 			// loop through and fix the broken tag send back to html // make my own cleaner.
 			//if( err.message == 'Error #1085: The element type "link" must be terminated by the matching end-tag "</link>"' ){ }
 		}
@@ -158,8 +158,8 @@ package com.base.parse {
 		}
 		
 		internal function loadStyles() :void {
-			links = html.head.link.length() - 1;
-			if( links == 0 ){ throw new IllegalOperationError( "Please include at least one style sheet. Thanks. \n\n" ); }
+			links = html.head.link.length();
+			if( links == 0 ){ throw new IllegalOperationError( "Please include at least one style sheet. Thanks." ); }
 			loadLink( html.head.link[ linkCount++ ] );
 		}
 		
@@ -171,6 +171,7 @@ package com.base.parse {
 					context.applicationDomain = ApplicationDomain.currentDomain;
 					try{
 						loader.contentLoaderInfo.addEventListener( Event.COMPLETE, linkLoaded );
+						trace("loading plugin: "+link.@href);
 						loader.load( new URLRequest( link.@href ) , context);
 					}catch(er:Error){
 						trace("ClassLoader can’t load= "+ er.message );
@@ -179,17 +180,20 @@ package com.base.parse {
 				} else if( link.@rel.toLowerCase() == "stylesheet" || link.@rel.toLowerCase() == "objects") { // load as text
 					linkLoader = new URLLoader();
 					linkLoader.addEventListener( Event.COMPLETE, linkLoaded );
+					trace("loading "+((link.@rel.toLowerCase() == "stylesheet")?"stylesheet":"object")+" at "+link.@href);
 					linkLoader.load( new URLRequest( link.@href ) );
 				}else{
 					finishLinks();
 				}
 			}else{
+				trace("link had no href");
 				loadLink( html.head.link[ linkCount++ ] );
 			}
 			
 		}
 		
 		internal function linkLoaded( ev:Event ) : void {
+			trace("loaded <link> element's contents");
 			var loadedData:String = linkLoader.data;
 			if( loadedData.substring(0, 1).toLowerCase() == "{" ){ 
 				objectTxt += loadedData;
@@ -201,20 +205,22 @@ package com.base.parse {
 		}
 		
 		internal function finishLinks() :void {
-			if( linkCount == links ){
+			if( html.head.link[ linkCount ] ){
+				loadLink( html.head.link[ linkCount++ ] );
+			} else {
 				if( objectTxt != "" ){
 					var decoder:JSONDecoder = new JSONDecoder( objectTxt );
 					json = decoder.getValue();
 				}
 				css = new Css( target );
 				target.addEventListener( "CSSLoaded", render );
+				trace("parsing css");
 				css.loadcss( styleTxt );
-			}else if( html.head.link[ linkCount+1 ] ){
-				loadLink( html.head.link[ linkCount++ ] );
 			}
 		}
 		
 		public function render( ev:Event ) :void {
+			trace("rendering");
 			//parse( ev.target, html.body.div.div ); 
 			var style:Object = styleElement( html.body, ev.target );
 			var root:Element = new Element( ev.target, style, target );			

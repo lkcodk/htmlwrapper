@@ -22,7 +22,7 @@ function wrapper( base ) {
 	so.addParam("allowScriptAccess", "always");
 	so.addVariable("content_url", document.location.href);
 	so.write("wrapper");
-	document.onresize = windowResize();
+	document.onresize = windowResize;
 }
 
 function windowResize() {

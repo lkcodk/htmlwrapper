@@ -239,22 +239,25 @@ package com.base.parse {
 			for each ( var child:* in node.children() ) {
 				var made:Boolean = false;
 				var thisNodeType:String = child.localName().toLowerCase();
-				loop1: for each ( var n:String in CONTAINER_NODE_TYPES ) {
-					if( n == thisNodeType ) { 
-						make( targ, node, child, !child.hasSimpleContent(), false );
-						made = true;
-						break loop1; 
-					} 
-				}
-				if( !made ){ // node was not in NODETYPES list
-					loop2: for each ( var nodetype:String in END_NODE_TYPES ) {
-						if ( thisNodeType == nodetype ) {
-							make( targ, node, child, false, false ); 
+				(function():void {
+					for each ( var n:String in CONTAINER_NODE_TYPES ) {
+						if( n == thisNodeType ) { 
+							make( targ, node, child, !child.hasSimpleContent(), false );
 							made = true;
-							break loop2;
-						}
-						
+							return; 
+						} 
 					}
+				})();
+				if( !made ){ // node was not in NODETYPES list
+					(function():void {
+						for each ( var nodetype:String in END_NODE_TYPES ) {
+							if ( thisNodeType == nodetype ) {
+								make( targ, node, child, false, false ); 
+								made = true;
+								return;
+							}
+						}
+					})();
 					
 				} // the node is ether text or it's unknown
 				if( !made ) make( targ, node, child, false, true );
@@ -609,7 +612,7 @@ package com.base.parse {
 				if( c.getChildByName( n ) ) { returnValue = c.getChildByName( n ); }
 				else{ loop( n, c ); }
 			}
-			function loop( id:String, container:DisplayObjectContainer ) : * {
+			function loop( id:String, container:DisplayObjectContainer ) : void {
 				for (var i:uint=0; i < container.numChildren; i++) {
 			        const child:* = container.getChildAt(i);
 					if( container.getChildAt(i) is DisplayObjectContainer ) {
@@ -655,7 +658,7 @@ package com.base.parse {
 		        child = container.getChildAt(i);
 		        trace( indentString, child.name, String(child).split("[object ").join("").split("]").join("") );
 		        if( container.getChildAt(i) is DisplayObjectContainer ) {
-		            traceDisplayObject(DisplayObjectContainer(child), indentString + "    ")
+		            traceDisplayObject(DisplayObjectContainer(child), indentString + "    ");
 		        }
 
 		    }

@@ -14,7 +14,7 @@ package com.base.utils {
 	
 	public class Proxy {
 		
-		public static function create( target:*, ev:Event = null, targ:* = null, eventType:String=null ) : * {
+		public static function create( target:*, ev:Event = null, targ:* = null, eventType:String=null ) : void {
 			var funcs:Array;
 			if( ev != null )
 				funcs = ev.currentTarget.STYLE.events[ev.type];

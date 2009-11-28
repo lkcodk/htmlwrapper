@@ -24,7 +24,7 @@ package com.base.browser {
             if (SWFAddress.onChange != null) {
                 clearInterval(SWFAddress._interval);
                 if (_availability) {
-                    ExternalInterface.addCallback('getSWFAddressValue', function():String {return _value});
+                    ExternalInterface.addCallback('getSWFAddressValue', function():String {return _value;});
                     ExternalInterface.addCallback('setSWFAddressValue', SWFAddress.setValue);
                 }
                 SWFAddress.setValue(SWFAddress.getValue());

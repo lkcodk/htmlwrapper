@@ -28,14 +28,14 @@ package com.base.application {
 				
 				if( document ) document.renderURL( SWFAddress.getValue() );
 				else{
-					trace(target.root.loaderInfo.parameters.content_url)
+					trace(target.root.loaderInfo.parameters.content_url);
 					if( target.root.loaderInfo.parameters.content_url ) {
 						document = new Html( target, target.root.loaderInfo.parameters.content_url ); 
 					}else{
 						document = new Html( target, SWFAddress.getLocation() );
 					}
 				}
-			}
+			};
 			
 		}
 		
